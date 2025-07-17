@@ -2,7 +2,7 @@ import React from 'react';
 import DownArrowIcon from '@/app/assets/icons/down-icon.svg';
 
 type Props = {
-   label: string;
+   label?: string;
    options: string[];
    value: string;
    onChange: (value: string) => void;

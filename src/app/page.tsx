@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { mockData } from "@/app/data/mockData";
 import Dropdown from "@/app/components/Dropdown";
 import PlayerTable from "@/app/components/Table";
@@ -41,7 +41,7 @@ export default function Home() {
   }, []);
 
   // Handle changes in operator
-  const handleOperatorChange = (selectedOperator: string) => {
+  const handleOperatorChange = useCallback((selectedOperator: string) => {
     setOperator(selectedOperator);
     const operatorGameTypes = mockData?.filter(game => game.operator === selectedOperator)
       .map(game => game.operatorGameType).flat();
@@ -50,10 +50,10 @@ export default function Home() {
     setPaginatedPlayers([]);
     setSelectedPlayer(null);
     setPage(1);
-  };
+  }, []);
 
   // Handle changes in game type
-  const handleGameTypeChange = (selectedGameType: string) => {
+  const handleGameTypeChange = useCallback((selectedGameType: string) => {
     setGameType(selectedGameType);
     const slateNamesForGameType = mockData?.filter(game => game.operatorGameType === selectedGameType)
       .map(game => game.operatorName).flat();
@@ -62,20 +62,20 @@ export default function Home() {
     setPaginatedPlayers([]);
     setSelectedPlayer(null);
     setPage(1);
-  };
+  }, []);
 
   // Handle game selection (to show relevant players)
-  const handleSlateNameChange = (selectedSlateName: string) => {
+  const handleSlateNameChange = useCallback((selectedSlateName: string) => {
     setSlateName(selectedSlateName);
     const playersForSlate = mockData?.find(game => game.operatorName === selectedSlateName)?.dfsSlatePlayers || [];
     setPlayers(playersForSlate);
     setPaginatedPlayers(playersForSlate.slice(0, playersPerPage)); // Reset pagination after changing slate name
     setSelectedPlayer(playersForSlate[0]); // Select the first player by default
     setPage(1);
-  };
+  }, []);
 
   // Pagination logic
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     const totalPages = Math.ceil(players.length / playersPerPage);
     if (newPage < 1 || newPage > totalPages) return;
 
@@ -84,20 +84,20 @@ export default function Home() {
     setPaginatedPlayers(players.slice(startIndex, endIndex));
     setPage(newPage);
     setSelectedPlayer(players[startIndex]);
-  };
+  }, [players, playersPerPage]);
 
   // Function to handle player selection
-  const handlePlayerSelect = (player: Player) => {
+  const handlePlayerSelect = useCallback((player: Player) => {
     setSelectedPlayer(player);
-  };
+  }, []);
 
-  const handleSetRowsPerPage = (rowsPerPage: number) => {
+  const handleSetRowsPerPage = useCallback((rowsPerPage: number) => {
     setPlayersPerPage(rowsPerPage);
     setPage(1);
     setPaginatedPlayers(players.slice(0, rowsPerPage));
-  }
+  }, [players]);
 
-  const totalPages = Math.ceil(players.length / playersPerPage);
+  const totalPages = useMemo(() => Math.ceil(players.length / playersPerPage), [players, playersPerPage]);
 
   return (
     <main className="bg-[#191919] min-h-screen">
@@ -117,13 +117,13 @@ export default function Home() {
             <div className="flex items-center justify-between p-4 border-t border-neutral-800 bg-[#262626]">
               <div className="flex items-center gap-2">
                 <span className="text-white">Page</span>
-                <Dropdown label={page.toString()} options={Array.from({ length: totalPages }, (_, i) => (i + 1).toString())} value={page.toString()} onChange={(value) => handlePageChange(parseInt(value))} />
+                <Dropdown options={Array.from({ length: totalPages }, (_, i) => (i + 1).toString())} value={page.toString()} onChange={(value) => handlePageChange(parseInt(value))} />
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="text-white">Rows per page</span>
                 <div className="relative">
-                  <Dropdown label={playersPerPage.toString()} options={['8', '16', '32', '64']} value={playersPerPage.toString()} onChange={(value) => handleSetRowsPerPage(parseInt(value))} />
+                  <Dropdown options={['8', '16', '32', '64']} value={playersPerPage.toString()} onChange={(value) => handleSetRowsPerPage(parseInt(value))} />
                 </div>
               </div>
 
