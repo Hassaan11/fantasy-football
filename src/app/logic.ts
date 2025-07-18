@@ -41,6 +41,7 @@ const useLogic = () => {
     setPaginatedPlayers([]);
     setSelectedPlayer(null);
     setPage(1);
+    setPlayersPerPage(8)
   }, []);
 
   // Handle changes in game type
@@ -53,6 +54,7 @@ const useLogic = () => {
     setPaginatedPlayers([]);
     setSelectedPlayer(null);
     setPage(1);
+    setPlayersPerPage(8)
   }, []);
 
   // Handle game selection (to show relevant players)
@@ -63,6 +65,7 @@ const useLogic = () => {
     setPaginatedPlayers(playersForSlate.slice(0, playersPerPage)); // Reset pagination after changing slate name
     setSelectedPlayer(playersForSlate[0]); // Select the first player by default
     setPage(1);
+    setPlayersPerPage(8)
   }, []);
 
   // Pagination logic
